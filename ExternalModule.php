@@ -20,15 +20,16 @@ class ExternalModule extends AbstractExternalModule {
     function hook_every_page_top($project_id) {
         include_once 'includes/export_project_button.php';
         if (export_large_projects_condition_check()) {
-            $str = export_large_projects_generate_button($project_id);
-            $js_vars = array();
-            $js_files = array();
-
-            $js_vars['button_html'] = $str;
+            $str = export_large_projects_generate_button($project_id, $this);
+            
             // Set up js variables.
+            $js_vars = array();            
+            $js_vars['button_html'] = $str;
             $this->initJsVars($js_vars);
-            $js_files[] = 'js/' . "export_project_button" . '.js';
+
             // Loads js files.
+            $js_files = array();
+            $js_files[] = 'js/' . "export_project_button" . '.js';
             $this->loadJsFiles($js_files);
         }
     }

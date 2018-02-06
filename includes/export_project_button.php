@@ -26,15 +26,15 @@ function export_large_projects_condition_check() {
     return true;
 }
 
-function export_large_projects_generate_button($pid) {
-
+function export_large_projects_generate_button($pid, $external_module_obj) {
+    $url = $external_module_obj->getUrl("includes/index.php");
     $str = "<button class - \"jqbuttonmed ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only\" "
-            . "style=\"display: block; margin-top: 10px;\" "
-            . "onclick=\"window.location.href = '" . APP_PATH_WEBROOT . "DataExport/index.php?pid=" . $pid . "&amp;report_id=ALL'"
-            . "+getSelectedInstrumentList();\" role=\"button\"><span class=\"ui-button-text\">"
-            . "<img src=\"" . APP_PATH_WEBROOT . "Resources/images/layout.png\" style=\"vertical-align:middle;\">"
-            . "<span style=\"vertical-align:middle;\">Export Large Projects</span>"
-            . "</span></button>";
+        . "style=\"display: block; margin-top: 10px;\" " . "onclick=\"window.location.href = '" 
+        . $url
+        ."'\" role=\"button\"><span class=\"ui-button-text\">"
+        . "<img src=\"" . APP_PATH_WEBROOT . "Resources/images/layout.png\" style=\"vertical-align:middle;\">"
+        . "<span style=\"vertical-align:middle;\">Export Large Projects</span>"
+        . "</span></button>";
     return $str;
 }
 
