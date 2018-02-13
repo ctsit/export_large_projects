@@ -10,19 +10,18 @@ require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
 
 
 //error_reporting(E_ALL);
-$de = ini_get('display_errors');
+// ini_set('display_errors', 1);
 
 // Enable flushing of output for progress meter...
-$zc = ini_get("zlib.output_compression");	// off
-$if = ini_get("implicit_flush");			// on
-$met = ini_get('max_execution_time');	//1800 seconds = 30 minutes
+ini_set("zlib.output_compression", 0);	// off
+ini_set("implicit_flush", 1);			// on
 
-pp1($de);
-pp1($zc);
-pp1($if);
-pp1($met);
+$max_execution_time = $_GET["max_execution_time"];
+ini_set('max_execution_time', $max_execution_time);	//1800 seconds = 30 minutes
 
-$fields_per_batch = 80000;
+$fields_per_batch_value = $_GET["fields_per_batch"];
+$fields_per_batch = $fields_per_batch_value;
+pp1($fields_per_batch);
 
 // Connect to REDCap
 require_once "../../redcap_connect.php";
@@ -73,7 +72,7 @@ if(isset($_POST['download'])) {
 $fields = REDCap::getFieldNames();
 $field_count = count($fields);
 $first_field = array_shift($fields);
-echo "First field of $field_count is $first_field\n";
+// echo "First field of $field_count is $first_field\n";
 
 // Get all record_ids
 $ids = REDCap::getData('array',NULL,array($first_field));
@@ -90,10 +89,10 @@ $batch_total = count($batches);
 
 // Create temp file - Set the target file to be saved in the temp dir (set timestamp in filename as 1 hour from now so that it gets deleted automatically in 1 hour)
 $inOneHour = date("YmdHis", mktime(date("H")+1,date("i"),date("s"),date("m"),date("d"),date("Y")));
-pp1($inOneHour);
+// pp1($inOneHour);
 $target_filename = "{$inOneHour}_pid{$project_id}_".generateRandomHash(6).".csv";
 $target_file = APP_PATH_TEMP . $target_filename;
-pp1($target_file);
+// pp1($target_file);
 
 echo RCView::div(array('class'=>'round chklist','id'=>'Large Data Export'),
 RCView::div(array('class'=>'chklisthdr','style'=>'color:rgb(128,0,0);margin-top:10px;'), "Exporting Complete CSV").

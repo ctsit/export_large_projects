@@ -20,7 +20,9 @@ class ExternalModule extends AbstractExternalModule {
     function hook_every_page_top($project_id) {
         include_once 'includes/export_project_button.php';
         if (export_large_projects_condition_check()) {
-            $str = export_large_projects_generate_button($project_id, $this);
+            $fields_per_batch = $this->getProjectSetting('fields-per-batch', $Proj->project_id);
+            $max_execution_time = $this->getProjectSetting('max-execution-time', $Proj->project_id);
+            $str = export_large_projects_generate_button($project_id, $this, $fields_per_batch, $max_execution_time);
             
             // Set up js variables.
             $js_vars = array();            
