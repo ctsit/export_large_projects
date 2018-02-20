@@ -6,7 +6,7 @@ This is test script to download an entire project that is causing memory issues.
 **/
 
 
-require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
+// require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
 
 
 //error_reporting(E_ALL);
@@ -21,13 +21,13 @@ ini_set('max_execution_time', $max_execution_time);	//1800 seconds = 30 minutes
 
 $fields_per_batch_value = $_GET["fields_per_batch"];
 $fields_per_batch = $fields_per_batch_value;
-pp1($fields_per_batch);
+// pp1($fields_per_batch);
 
-// Connect to REDCap
-require_once "../../redcap_connect.php";
+// // Connect to REDCap
+// require_once "../../redcap_connect.php";
 
-// include export project button php file
-include_once "export_project_button.php";
+// // include export project button php file
+// include_once "export_project_button.php";
 
 // Check user privs
 if (!SUPER_USER) {
@@ -63,7 +63,13 @@ if(isset($_POST['download'])) {
 	REDCap::logEvent("Full Export Downloaded");
 	exit();
 }
+require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
 
+// Connect to REDCap
+require_once "../../redcap_connect.php";
+
+// include export project button php file
+include_once "export_project_button.php";
 // // Render the page
 // include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 //header( 'Content-type: text/html; charset=utf-8' );
