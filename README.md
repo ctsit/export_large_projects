@@ -8,9 +8,9 @@ This is a REDCap external module that provides functionality to export large pro
 
 ## Configuration
 Access External projects section in a project, and give configuration details.
-![Config form](img/configuration.png)
+![Config form](images/configuration.png)
 
 ## How to use?
 Once this module is enabled for a project, go to "Data Exports, Reports, and Stats" section. In here Export Large Projects button is present as shown in the below image.
 Click that button then the data present in the project is copied in chunks and finally saved as a single csv file. And finally download link is given to download this file.
-![Export Large Projects button](img/export_large_project_button.png)
+![Export Large Projects button](images/export_large_project_button.png)
