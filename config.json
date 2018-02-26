@@ -1,11 +1,16 @@
 {
     "name": "Export large projects",
     "namespace": "ExportLargeProjects\\ExternalModule",
-    "description": "This modules enables redcap to export large projects without getting timeout.",
+    "description": "This modules enables redcap to export large projects without getting timeout. This module is developed to bring the already present feature(https://stanfordmedicine.app.box.com/s/eeej6fwiiv3j8t2c473g/file/29706748731) to REDCap's external modules.",
     "permissions": [
         "hook_every_page_top"
     ],
     "authors": [
+        {
+            "name": "Surya Prasanna",
+            "email": "suryayalla@ufl.edu",
+            "institution": "CTS-IT - University of Florida"
+        },
         {
             "name": "Philip Chase",
             "email": "pbc@ufl.edu",
@@ -15,36 +20,6 @@
             "name": "Taryn Stoffs",
             "email": "tls@ufl.edu",
             "institution": "CTS-IT - University of Florida"
-        },
-        {
-            "name": "Surya Prasanna",
-            "email": "suryayalla@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
-        },
-        {
-            "name": "Dileep Rajput",
-            "email": "rajputd@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
-        },
-        {
-            "name": "Stewart Wehmeyer",
-            "email": "swehmeyer@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
-        },
-        {
-            "name": "Tiago Bember",
-            "email": "tbembersimeao@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
-        },
-        {
-            "name": "Mike Conlon, Ph.D.",
-            "email": "mconlon@ufl.edu",
-            "institution": "University of Florida"
-        },
-        {
-            "name": "Carl J Pepine, M.D., MACC",
-            "email": "",
-            "institution": "University of Florida"
         }
     ],
     "project-settings": [
@@ -60,5 +35,9 @@
             "type": "text",
             "default": "1200"
         }
-    ]
+    ],
+    "compatibility": {
+        "redcap-version-min": "8.0.3",
+        "redcap-version-max": ""
+   }
 }
