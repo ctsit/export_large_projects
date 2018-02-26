@@ -1,39 +1,25 @@
 <?php
-/**
-
-This is test script to download an entire project that is causing memory issues...
-
-**/
-
-
-// require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
-
-
-//error_reporting(E_ALL);
-// ini_set('display_errors', 1);
+/*
+ * This script is called when export large projects button is clicked.
+ * It collects entire project in bunches and store them in a single csv file in databse for 1 hour.
+ * This page also allows users to download the generated csv file.
+ */
 
 // Enable flushing of output for progress meter...
 ini_set("zlib.output_compression", 0);	// off
 ini_set("implicit_flush", 1);			// on
 
+// Get max excecution time and number of fields per batch value from the project configuration.
 $max_execution_time = $_GET["max_execution_time"];
 ini_set('max_execution_time', $max_execution_time);	//1800 seconds = 30 minutes
 
 $fields_per_batch_value = $_GET["fields_per_batch"];
 $fields_per_batch = $fields_per_batch_value;
-// pp1($fields_per_batch);
-
-// // Connect to REDCap
-// require_once "../../redcap_connect.php";
-
-// // include export project button php file
-// include_once "export_project_button.php";
 
 // Check user privs
 if (!SUPER_USER) {
 	$rights = REDCap::getUserRights(USERID);
 	$rights = $rights[USERID];
-	//echo "<pre>" . print_r($rights,true) . "</pre>";
 	if ($rights['data_export_tool'] != 1) {
 		include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 		displayMsg("You do not have proper data export rights to use this tool ({$rights[USERID]['data_export_tool']})", "errorMsg","center","red","exclamation_frame.png", 600);
@@ -58,21 +44,20 @@ if(isset($_POST['download'])) {
 	header('Content-Disposition: attachment; filename="'.$target_filename.'"');
 	header('Content-Length: ' . filesize($target_file));
 	ob_end_flush();
-	readfile_chunked($target_file);
-//	unlink($target_file);
+    readfile_chunked($target_file);
+    
+    // Log event
 	REDCap::logEvent("Full Export Downloaded");
 	exit();
 }
-require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
 
+// add redcap header
+require_once \ExternalModules\ExternalModules::getProjectHeaderPath();
 // Connect to REDCap
 require_once "../../redcap_connect.php";
 
 // include export project button php file
 include_once "export_project_button.php";
-// // Render the page
-// include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
-//header( 'Content-type: text/html; charset=utf-8' );
 
 // Get name of first field:
 $fields = REDCap::getFieldNames();
@@ -91,14 +76,11 @@ $id_count = count($ids);
 $records_per_batch = max(1,floor($fields_per_batch / $field_count));
 $batches = array_chunk($ids,$records_per_batch);
 $batch_total = count($batches);
-// print "<pre>" . print_r($batches,true) . "</pre>";
 
 // Create temp file - Set the target file to be saved in the temp dir (set timestamp in filename as 1 hour from now so that it gets deleted automatically in 1 hour)
 $inOneHour = date("YmdHis", mktime(date("H")+1,date("i"),date("s"),date("m"),date("d"),date("Y")));
-// pp1($inOneHour);
 $target_filename = "{$inOneHour}_pid{$project_id}_".generateRandomHash(6).".csv";
 $target_file = APP_PATH_TEMP . $target_filename;
-// pp1($target_file);
 
 echo RCView::div(array('class'=>'round chklist','id'=>'Large Data Export'),
 RCView::div(array('class'=>'chklisthdr','style'=>'color:rgb(128,0,0);margin-top:10px;'), "Exporting Complete CSV").
@@ -134,13 +116,11 @@ foreach ($batches as $b => $batch) {
 	echo str_repeat(' ',1024*64);
 	flush();
 	ob_flush();
-//if ($b == 0) {
 	$records = REDCap::getData('csv', $batch);	
 	// Trim the header on all but the first row of the first batch
 	if ($b != 0) $records = trimHeader($records);
 	//print "Records: <pre>" . print_r($records,true) . "</pre>";
 	fwrite($fh, $records);
-//}
 	$batch_times[$b] = microtime(true) - $batch_start;
 }
 fclose($fh);
@@ -167,13 +147,6 @@ echo "<br>" . $html;
 echo str_repeat(' ',1024*64);
 flush();
 
-//print "\nRecords: $records";
-//echo "\n".print_r($records,true);
 exit();
-
-
-pp1("It works!");
-
-
 
 ?>
