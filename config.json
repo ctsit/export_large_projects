@@ -9,17 +9,22 @@
         {
             "name": "Surya Prasanna",
             "email": "suryayalla@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
+            "institution": "University of Florida - CTSI"
         },
         {
             "name": "Philip Chase",
             "email": "pbc@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
+            "institution": "University of Florida - CTSI"
         },
         {
             "name": "Taryn Stoffs",
             "email": "tls@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Andy Martin",
+            "email": "andy123@stanford.edu",
+            "institution": "Stanford University"
         }
     ],
     "project-settings": [
