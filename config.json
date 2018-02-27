@@ -1,0 +1,43 @@
+{
+    "name": "Export large projects",
+    "namespace": "ExportLargeProjects\\ExternalModule",
+    "description": "This modules enables redcap to export large projects without getting timeout. This module is developed to bring the already present feature(https://stanfordmedicine.app.box.com/s/eeej6fwiiv3j8t2c473g/file/29706748731) to REDCap's external modules.",
+    "permissions": [
+        "hook_every_page_top"
+    ],
+    "authors": [
+        {
+            "name": "Surya Prasanna",
+            "email": "suryayalla@ufl.edu",
+            "institution": "CTS-IT - University of Florida"
+        },
+        {
+            "name": "Philip Chase",
+            "email": "pbc@ufl.edu",
+            "institution": "CTS-IT - University of Florida"
+        },
+        {
+            "name": "Taryn Stoffs",
+            "email": "tls@ufl.edu",
+            "institution": "CTS-IT - University of Florida"
+        }
+    ],
+    "project-settings": [
+        {
+            "key": "fields-per-batch",
+            "name": "No. of fields per batch",
+            "type": "text",
+            "default": "8000"
+        },
+        {
+            "key": "max-execution-time",
+            "name": "Max execution time",
+            "type": "text",
+            "default": "1200"
+        }
+    ],
+    "compatibility": {
+        "redcap-version-min": "8.0.3",
+        "redcap-version-max": ""
+   }
+}
