@@ -27,7 +27,7 @@
             "institution": "Stanford University"
         }
     ],
-    "project-settings": [
+    "system-settings": [
         {
             "key": "fields-per-batch",
             "name": "No. of fields per batch",
