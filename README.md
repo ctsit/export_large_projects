@@ -1,8 +1,11 @@
 # Export Large Project
 This is a REDCap external module that provides functionality to export large projects.
 
-## Installation
-- Clone this repo into `<redcap-root>/modules/export_large_projects_v<version_number>`.
+## Easy Installation
+- Obtain this module from the Consortium [REDCap Repo] (https://redcap.vanderbilt.edu/consortium/modules/index.php) from the control center.
+
+## Manual Installation
+- Clone this repo into `<redcap-root>/modules/export_large_projects_v0.0.0`.
 - Go to **Control Center > Manage External Modules** and enable Export Large Projects.
 - Go to your project home page, click on **Manage External Modules** link, and then enable Export Large Projects.
 
