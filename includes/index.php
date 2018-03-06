@@ -125,6 +125,10 @@ foreach ($batches as $b => $batch) {
 	// Trim the header on all but the first row of the first batch
 	if ($b != 0) $records = trimHeader($records);
 	//print "Records: <pre>" . print_r($records,true) . "</pre>";
+
+	$str = "Batch " . $b . " data fetched.";
+	REDCap::logEvent($str);
+
 	fwrite($fh, $records);
 	$batch_times[$b] = microtime(true) - $batch_start;
 	$str = "Batch " . $b . " is completed.";
