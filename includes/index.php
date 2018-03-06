@@ -94,8 +94,11 @@ REDCap::logEvent("Full Export Requested");
 $fh = fopen($target_file, 'w') or die("can't open file");
 $time_start = microtime(true);
 $batch_times = array();
-
+$str = "Total no of batches are " . $batch_total;
+REDCap::logEvent($str);
 foreach ($batches as $b => $batch) {
+	$str = "Batch " . $b . " started.";
+	REDCap::logEvent($str);
 	print "<pre>Batch $b starts at " . $batch[0] . "</pre>";
 	$batch_start = microtime(true);
 	if (!empty($batch_times)) {
@@ -107,23 +110,28 @@ foreach ($batches as $b => $batch) {
 	}
 	$percent = intval(($b+1)/$batch_total * 100).'%';
 	$msg = "Processing batch " . ($b + 1) . " of $batch_total.";
+	echo '<script>var id_arr = ' . json_encode($batch) . ';</script>';
+	echo '<script>var batch_number = ' . json_encode($b) . ';</script>';
 	echo "
 	<script language='javascript'>
-		//console.log($('#progress').html());
+		console.log(\"For batch no \" + batch_number + \" no of records ids in one go \" + id_arr.length);
 		$('#progress').html('<div style=\"width:$percent;background-color:#ddd;\">&nbsp;</div>');
 		$('#progress_info').html('$msg<br>$percent complete<br>$time_remaining_msg');
 	</script>";
 	echo str_repeat(' ',1024*64);
 	flush();
 	ob_flush();
-	$records = REDCap::getData('csv', $batch);	
+	$records = REDCap::getData('csv', $batch);
 	// Trim the header on all but the first row of the first batch
 	if ($b != 0) $records = trimHeader($records);
 	//print "Records: <pre>" . print_r($records,true) . "</pre>";
 	fwrite($fh, $records);
 	$batch_times[$b] = microtime(true) - $batch_start;
+	$str = "Batch " . $b . " is completed.";
+	REDCap::logEvent($str);
 }
 fclose($fh);
+REDCap::logEvent("Finally completed the batch writing process.");
 
 // Data CSV file download icon
 $html = RCView::form(
