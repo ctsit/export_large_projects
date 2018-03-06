@@ -1,7 +1,7 @@
 {
     "name": "Export large projects",
     "namespace": "ExportLargeProjects\\ExternalModule",
-    "description": "This modules enables redcap to export large projects without getting timeout. This module is developed to bring the already present feature(https://stanfordmedicine.app.box.com/s/eeej6fwiiv3j8t2c473g/file/29706748731) to REDCap's external modules.",
+    "description": "This module enables REDCap to export large projects without getting a timeout. This module is developed to bring Stanford University's Large Project Export plugin to REDCap's external modules. See the <b><a href='https://github.com/ctsit/export_large_projects' target='_blank'>documentation</a></b> at <a href='https://github.com/ctsit/export_large_projects' target='_blank'>https://github.com/ctsitexport_large_projects</a>",
     "permissions": [
         "hook_every_page_top"
     ],
@@ -9,20 +9,25 @@
         {
             "name": "Surya Prasanna",
             "email": "suryayalla@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
+            "institution": "University of Florida - CTSI"
         },
         {
             "name": "Philip Chase",
             "email": "pbc@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
+            "institution": "University of Florida - CTSI"
         },
         {
             "name": "Taryn Stoffs",
             "email": "tls@ufl.edu",
-            "institution": "CTS-IT - University of Florida"
+            "institution": "University of Florida - CTSI"
+        },
+        {
+            "name": "Andy Martin",
+            "email": "andy123@stanford.edu",
+            "institution": "Stanford University"
         }
     ],
-    "project-settings": [
+    "system-settings": [
         {
             "key": "fields-per-batch",
             "name": "No. of fields per batch",
