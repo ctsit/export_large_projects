@@ -47,7 +47,7 @@ if(isset($_POST['download'])) {
     readfile_chunked($target_file);
     
     // Log event
-	REDCap::logEvent("Full Export Downloaded");
+	REDCap::logEvent('<span style="color: green;">Large project export file downloaded</span>', 'file_name: ' . $target_filename);
 	exit();
 }
 
@@ -61,18 +61,18 @@ include_once "export_project_button.php";
 
 $token = $_GET["token"];
 if (!$token) {
+    // Generating token.
+	$token = generateRandomHash(6);
+    REDCap::logEvent('<span style="color: green;">Large project export requested</span>', 'export_id: ' . $token);
+
 	// Get name of first field:
-	$fields = REDCap::getFieldNames();
+    $fields = REDCap::getFieldNames();
 	$field_count = count($fields);
-	$first_field = array_shift($fields);
-	// echo "First field of $field_count is $first_field\n";
 
 	// Get all record_ids
-	$ids = REDCap::getData('array',NULL,array($first_field));
+	$ids = REDCap::getData('array',NULL,array($fields[0]));
 	$ids = array_keys($ids);
 	$id_count = count($ids);
-	//echo "Records are: <pre>" . print_r($ids,true) . "</pre>";
-	//echo "\nRecord count is " . count($ids);
 
 	// Determine batching size (with a minimum of 1 record per export).
 	$records_per_batch = max(1,floor($fields_per_batch / $field_count));
@@ -84,66 +84,65 @@ if (!$token) {
 
 	// Create temp file - Set the target file to be saved in the temp dir (set timestamp in filename as 1 hour from now so that it gets deleted automatically in 1 hour)
 	$inOneHour = date("YmdHis", mktime(date("H")+1,date("i"),date("s"),date("m"),date("d"),date("Y")));
-	$token = generateRandomHash(6);
+
 	$target_filename = "{$inOneHour}_pid{$project_id}_".$token.".csv";
 	$target_file = APP_PATH_TEMP . $target_filename;
 
 	$time_start = microtime(true);
 	$batch_times = array();
 
-	// store all the required session variables.
-	$_SESSION['token'] = $token;
-	$_SESSION['target_file'] = $target_file;
-	$_SESSION['target_filename'] = $target_filename;
-	$_SESSION['batches'] = $batches;
-	$_SESSION['id_count'] = $id_count;
-	$_SESSION['batch_total'] = $batch_total;
-	$_SESSION['curr_batch_count'] = 0;
+    // store all the required session variables.
+    $_SESSION['elp'] = array(
+        'token' => $token,
+        'target_file' => $target_file,
+        'target_filename' => $target_filename,
+        'batches' => $batches,
+        'id_count' => $id_count,
+        'batch_total' => $batch_total,
+        'curr_batch_count' => 0,
+    );
+
 	$actual_link = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 	$redirect_url = $actual_link . "&token=" . $token;
 
 	$fh = fopen($target_file, 'w') or die("can't open file");
 
 } else {
-	if ($_SESSION['token'] != $token) {
+	if ($_SESSION['elp']['token'] != $token) {
 		echo "<pre>" . "Exiting as tokens are different." ."</pre>";
 		exit();
 	}
 	// $target_file should be fetched from session.
-	$target_file = $_SESSION['target_file'];
-	$target_filename = $_SESSION['target_filename'];
+	$target_file = $_SESSION['elp']['target_file'];
+	$target_filename = $_SESSION['elp']['target_filename'];
 
 	//fetch $batches from session
-	$batches = $_SESSION['batches'];
+	$batches = $_SESSION['elp']['batches'];
 	$curr_batch = array_pop($batches);
 
 	// store the remainging batches in session.
-	$_SESSION['batches'] = $batches;
-	$batch_times = $_SESSION['batch_times'];
+	$_SESSION['elp']['batches'] = $batches;
+	$batch_times = $_SESSION['elp']['batch_times'];
 
 	//fetch and increment $curr_batch_count
-	$curr_batch_count = $_SESSION['curr_batch_count']+1;
-	// print($curr_batch_count);
-	$_SESSION['curr_batch_count']++;
-	$batch_total = $_SESSION['batch_total'];
-	$id_count = $_SESSION['id_count'];
+	$curr_batch_count = $_SESSION['elp']['curr_batch_count']+1;
+	$_SESSION['elp']['curr_batch_count']++;
+	$batch_total = $_SESSION['elp']['batch_total'];
+	$id_count = $_SESSION['elp']['id_count'];
 
 	$fh = fopen($target_file, 'a') or die("can't open file");
 	$redirect_url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 }
 
-echo RCView::div(array('class'=>'round chklist','id'=>'Large Data Export'),
-RCView::div(array('class'=>'chklisthdr','style'=>'color:rgb(128,0,0);margin-top:10px;'), "Exporting Complete CSV").
-RCView::p(array(),"Breaking $id_count records into $batch_total batch exports...").
-RCView::div(array('id'=>'progress','style'=>'width:600px;border:1px solid #ccc;margin-bottom:10px;')).
-RCView::div(array('id'=>'progress_info','style'=>'width'))
-);
+$bar = RCView::div(array('class'=>'chklisthdr','style'=>'color:rgb(128,0,0);margin:10px 0;'), "Exporting Complete CSV");
+if ($batch_total > 1) {
+    $bar .= RCView::p(array(),"Breaking $id_count records into $batch_total batch exports...");
+}
 
-// Start Export
-REDCap::logEvent("Full Export Requested");
+$bar .= RCView::div(array('id'=>'progress','style'=>'width:600px;border:1px solid #ccc;margin-bottom:10px;')) .
+        RCView::div(array('id'=>'progress_info','style'=>'width'));
 
-$str = "Batch " . $curr_batch_count . " started.";
-REDCap::logEvent($str);
+echo RCView::div(array('class'=>'round chklist','id'=>'Large Data Export'), $bar);
 
 $batch_start = microtime(true);
 if (!empty($batch_times)) {
@@ -153,15 +152,17 @@ if (!empty($batch_times)) {
 	$time_remaining = round($batch_remaining * $batch_avg);
 	$time_remaining_msg = "Approximately " . $time_remaining . " seconds remaining...";
 }
-$percent = intval(($curr_batch_count+1)/$batch_total * 100).'%';
+
+$percent = '100%';
+if ($batch_total) {
+    $percent = intval(($curr_batch_count+1)/$batch_total * 100).'%';
+}
 
 $msg = "Processing batch " . ($curr_batch_count + 1) . " of $batch_total.";
-echo '<script>var id_arr = ' . json_encode($curr_batch) . ';</script>';
 echo '<script>var batch_number = ' . json_encode($curr_batch_count) . ';</script>';
 echo "
 <script language='javascript'>
-	console.log(\"For batch no \" + batch_number + \" no of records ids in one go \" + id_arr.length);
-	$('#progress').html('<div style=\"width:$percent;background-color:#ddd;\">&nbsp;</div>');
+	$('#progress').html('<div style=\"width:$percent;background-color:#cce5ff;\">&nbsp;</div>');
 	$('#progress_info').html('$msg<br>$percent complete<br>$time_remaining_msg');
 </script>";
 echo str_repeat(' ',1024*64);
@@ -171,26 +172,40 @@ ob_flush();
 $records = REDCap::getData('csv', $curr_batch);
 // Trim the header on all but the first row of the first batch
 if ($curr_batch_count != 0) {
-	$records = trimHeader($records);
+	$first_cr = strpos($records, "\n");
+	if ($first_cr !== false) {
+        $records = substr($records, $first_cr+1);
+    }
 }
-//print "Records: <pre>" . print_r($records,true) . "</pre>";
 
-$str = "Batch " . $curr_batch_count . " data fetched.";
-REDCap::logEvent($str);
 sleep(1);
 fwrite($fh, $records);
 $batch_times[$curr_batch_count] = microtime(true) - $batch_start;
-$_SESSION['batch_times'] = $batch_times;
+$_SESSION['elp']['batch_times'] = $batch_times;
 
-$str = "Batch " . $curr_batch_count . " is completed.";
-REDCap::logEvent($str);
 fclose($fh);
 
-if ($curr_batch_count+1 == $batch_total) {
+if ($curr_batch_count+1 == $batch_total || !$batch_total) {
 	
-	//Batch writing is completed.
-	REDCap::logEvent("Finally completed the batch writing process.");
-	// Data CSV file download icon
+    //Batch writing is completed.
+    $duration = round(array_sum($batch_times));
+    $report = array(
+        'export_id: ' . $token,
+        'total_records: ' . $id_count,
+        'duration: ' . $duration . ' seconds',
+        'fields: "' . implode(', ', REDCap::getFieldNames()) . '"',
+    );
+    REDCap::logEvent('<span style="color: green;">Large project exported completed</span>', implode(",\n", $report));
+
+    $filesize = filesize($target_file);
+    if ($filesize < 1024) {
+        $filesize .= $filesize > 1 ? ' bytes' : ' byte';
+    }
+    else {
+        $filesize = ($filesize / 1024) . ' kb';
+    }
+
+    // Data CSV file download icon
 	$html = RCView::form(
 		array('method'=>'post', 'name'=>'full_export', 'action'=>$_SERVER['REQUEST_URI'], 'enctype'=>'multipart/form-data'),
 		RCView::input(array('type'=>'hidden', 'name'=>'download', 'value'=>$target_filename)) .
@@ -198,19 +213,22 @@ if ($curr_batch_count+1 == $batch_total) {
 			'name'=>'submit-btn-download',
 			'class'=>'jqbutton',
 			'style'=>'color:#800000;width:200px;',
-			'onclick'=>'$(this).submit();'),"<div style='float:left;padding-top:2px;'>" . trim(DataExport::getDownloadIcon('csv', false)) . "</div><div style='padding-top:8px;'>Download export<div style='font-size:smaller;'>Filesize: " . round(filesize($target_file)/1024) . "kb</div></div>"
+			'onclick'=>'$(this).submit();'),"<div style='float:left;padding-top:2px;'>" . trim(DataExport::getDownloadIcon('csv', false)) . "</div><div style='padding-top:8px;'>Download export<div style='font-size:smaller;'>File size: " . $filesize . "</div></div>"
 		) . 
-		RCView::div(array('style'=>'margin:10px;'),"This file will be automatically deleted from the server in approximately one hour")
+		RCView::div(array('style'=>'margin:10px;'),"This file will be automatically deleted from the server in approximately one hour.")
 	);
 
-	$id_count = $_SESSION['id_count'];
-	$msg = "Processed $id_count records in " . round(array_sum($batch_times)) . " seconds.";
+	$id_count = $_SESSION['elp']['id_count'];
 	echo "
 		<script language='javascript'>
-			$('#progress_info').html('$msg');
+			$('#progress_info').html('Processed $id_count records in " . $duration . " seconds.');
 		</script>";
 	echo "<br>" . $html;
-	echo str_repeat(' ',1024*64);
+    echo str_repeat(' ',1024*64);
+
+    // Cleaning up session.
+    unset($_SESSION['elp']);
+
 	flush();
 
 } else {

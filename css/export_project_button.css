@@ -1,0 +1,10 @@
+#export-large-projects-btn {
+    display: block;
+    margin-top: 10px;
+    font-size: 11px;
+}
+
+#export-large-projects-btn img,
+#export-large-projects-btn span {
+    vertical-align: middle;
+}
