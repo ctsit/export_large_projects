@@ -22,27 +22,31 @@
             "institution": "University of Florida - CTSI"
         },
         {
+            "name": "Tiago Bember Simeao",
+            "email": "tbembersimeao@ufl.edu",
+            "institution": "University of Florida - CTSI"
+        },
+        {
             "name": "Andy Martin",
             "email": "andy123@stanford.edu",
             "institution": "Stanford University"
         }
     ],
-    "system-settings": [
+    "project-settings": [
         {
-            "key": "fields-per-batch",
-            "name": "No. of fields per batch",
+            "key": "items_per_batch",
+            "name": "No. of items per batch",
             "type": "text",
-            "default": "8000"
+            "default": "200"
         },
         {
-            "key": "max-execution-time",
+            "key": "max_execution_time",
             "name": "Max execution time",
             "type": "text",
             "default": "1200"
         }
     ],
     "compatibility": {
-        "redcap-version-min": "8.0.3",
-        "redcap-version-max": ""
+        "redcap-version-min": "8.0.3"
    }
 }
