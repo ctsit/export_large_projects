@@ -42,12 +42,13 @@ try {
             $records = substr($records, $first_cr + 1);
         }
     }
+
+    fwrite($fh, $records);
 }
 catch (Exception $e) {
     $module->returnAjaxError('An error occurred during export.');
 }
 
-fwrite($fh, $records);
 fclose($fh);
 
 // Updating batch queue info.

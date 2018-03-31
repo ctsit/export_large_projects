@@ -17,4 +17,5 @@ header('Content-Length: ' . filesize($target_file));
 readfile_chunked($target_file);
 
 // Log event
-REDCap::logEvent('<span style="color: green;">Large project export file downloaded</span>', 'file_name: ' . $target_filename);
+$msg = RCView::span(array('style' => 'color: green;'), 'Large project export file downloaded');
+REDCap::logEvent($msg, 'file_name: ' . $target_filename);
