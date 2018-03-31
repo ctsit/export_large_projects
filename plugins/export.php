@@ -6,7 +6,7 @@
  */
 
 $module->checkExportAccess();
-foreach (array('max_execution_time', 'items_per_batch') as $param) {
+foreach (array('max_execution_time', 'fields_per_batch') as $param) {
     if (!isset($_GET[$param]) || !is_numeric($_GET[$param])) {
         $module->renderErrorPage('Missing or invalid parameters.');
     }
@@ -39,7 +39,8 @@ global $Proj;
 $ids = REDCap::getData('array', null, $Proj->table_pk);
 $ids = array_keys($ids);
 
-$batches = array_reverse(array_chunk($ids, $_GET['items_per_batch']));
+$batch_size = max(1, floor($_GET['fields_per_batch'] / count($Proj->metadata)));
+$batches = array_reverse(array_chunk($ids, $batch_size));
 
 // Store all the required session variables.
 $_SESSION['elp'][$token] = array(

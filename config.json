@@ -34,14 +34,14 @@
     ],
     "project-settings": [
         {
-            "key": "items_per_batch",
-            "name": "No. of items per batch",
+            "key": "fields_per_batch",
+            "name": "No. of fields per batch",
             "type": "text",
-            "default": "200"
+            "default": "80000"
         },
         {
             "key": "max_execution_time",
-            "name": "Max execution time",
+            "name": "Max execution time per batch",
             "type": "text",
             "default": "1200"
         }

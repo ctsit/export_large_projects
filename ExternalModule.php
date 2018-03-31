@@ -111,7 +111,7 @@ class ExternalModule extends AbstractExternalModule {
      */
     protected function buildExportButton($project_id) {
         $url = $this->getUrl('plugins/export.php');
-        foreach (array('items_per_batch', 'max_execution_time') as $setting) {
+        foreach (array('fields_per_batch', 'max_execution_time') as $setting) {
             $url .= '&' . $setting . '=' . $this->getProjectSetting($setting);
         }
 
