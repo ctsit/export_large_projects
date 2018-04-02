@@ -28,16 +28,10 @@ class ExternalModule extends AbstractExternalModule {
     /**
      * Display an error page containing the given message.
      */
-    function renderErrorPage($msg) {
-        extract($GLOBALS);
-        include_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
-
-        renderPageTitle();
-        displayMsg($msg, 'errorMsg', 'center', 'red', 'exclamation.png', null, false);
-
+    function renderErrorPage($error_msg) {
+        displayMsg($error_msg, 'errorMsg', 'center', 'red', 'exclamation.png', null, false);
         include_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';
-
-        unset($_SESSION['elp']);
+        ob_end_flush();
         exit;
     }
 
@@ -45,7 +39,7 @@ class ExternalModule extends AbstractExternalModule {
      * Throws an access denied error message if the current user has no access
      * to Export Large Projects.
      */
-    function checkExportAccess($ajax = false) {
+    function checkExportAccess() {
         if (SUPER_USER) {
             return;
         }
@@ -55,25 +49,7 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
-        $msg = 'Access denied.';
-        if ($ajax) {
-            $this->returnAjaxError($msg);
-        }
-
-        $this->renderErrorPage($msg);
-    }
-
-    /**
-     * Returns an AJAX error containing the given message.
-     */
-    function returnAjaxError($msg) {
-        echo json_encode(array(
-            'success' => false,
-            'errorMsg' => htmlspecialchars($msg),
-        ));
-
-        unset($_SESSION['elp']);
-        exit;
+        $this->renderErrorPage('Access denied.');
     }
 
     /**
@@ -107,11 +83,24 @@ class ExternalModule extends AbstractExternalModule {
     }
 
     /**
+     * Calls a JS function implemented in the module global object.
+     *
+     * @param string $function
+     *   The callback function.
+     * @param array $params
+     *   Array containing callback parameters.
+     */
+    function callJsCallback($function, $params = array()) {
+        $input = empty($params) ? '' : '\'' . implode('\', \'', $params) . '\'';
+        echo '<script>if (typeof exportLargeProjects.' . $function . ' !== \'undefined\') exportLargeProjects.' . $function . '(' . $input . ');</script>';
+    }
+
+    /**
      * Builds up Export Large Projects button.
      */
     protected function buildExportButton($project_id) {
         $url = $this->getUrl('plugins/export.php');
-        foreach (array('fields_per_batch', 'max_execution_time') as $setting) {
+        foreach (array('fields_per_batch', 'max_execution_time_per_batch') as $setting) {
             $url .= '&' . $setting . '=' . $this->getProjectSetting($setting);
         }
 
