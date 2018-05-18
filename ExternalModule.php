@@ -8,6 +8,7 @@ namespace ExportLargeProjects\ExternalModule;
 
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
+use RCView;
 
 /**
  * ExternalModule class for Exporting Large Projects.
@@ -18,49 +19,106 @@ class ExternalModule extends AbstractExternalModule {
      * @inheritdoc
      */
     function hook_every_page_top($project_id) {
-        include_once 'includes/export_project_button.php';
-        // check if export large projects module should run on this page.
-        if (export_large_projects_condition_check()) {
-
-            // get configuration parameters
-            $fields_per_batch = $this->getProjectSetting('fields-per-batch', $Proj->project_id);
-            $max_execution_time = $this->getProjectSetting('max-execution-time', $Proj->project_id);
-
-            //generate url string.
-            $str = export_large_projects_generate_button($project_id, $this, $fields_per_batch, $max_execution_time);
-            
-            // Set up js variables.
-            $js_vars = array();
-            $js_vars['button_html'] = $str;
-            $this->initJsVars($js_vars);
-
-            // Loads js files.
-            $js_files = array();
-            $js_files[] = 'js/' . "export_project_button" . '.js';
-            $this->loadJsFiles($js_files);
+        if (PAGE == 'DataExport/index.php' && !isset($_GET['create']) && !isset($_GET['other_export_options'])) {
+            // Setting up button.
+            $this->buildExportButton($project_id);
         }
     }
 
     /**
-     * Loads js files.
-     *
-     * @param array $js_files
-     *   An array of js files paths within the module.
+     * Display an error page containing the given message.
      */
-    function loadJsFiles($js_files) {
-        foreach ($js_files as $file) {
-            echo '<script src="' . $this->getUrl($file) . '"></script>';
-        }
+    function renderErrorPage($error_msg) {
+        displayMsg($error_msg, 'errorMsg', 'center', 'red', 'exclamation.png', null, false);
+        include_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';
+        ob_end_flush();
+        exit;
     }
 
     /**
-     * Loads js variables.
-     *
-     * @param array $varss
-     *   An array of js variables to set up.
+     * Throws an access denied error message if the current user has no access
+     * to Export Large Projects.
      */
-     function initJsVars($vars) {
-        echo '<script>var exportLargeProjects = ' . json_encode($vars) . ';</script>';
+    function checkExportAccess() {
+        if (SUPER_USER) {
+            return;
+        }
+
+        $rights = REDCap::getUserRights(USERID);
+        if (!empty($rights[USERID]['data_export_tool'])) {
+            return;
+        }
+
+        $this->renderErrorPage('Access denied.');
     }
 
+    /**
+     * Loads a local JS file.
+     *
+     * @param array $path
+     *   The relative path of the JS file.
+     */
+    function loadJsFile($path) {
+        echo '<script src="' . $this->getUrl($path) . '"></script>';
+    }
+
+    /**
+     * Loads a local CSS file.
+     *
+     * @param string $path
+     *   The relative path to the css file.
+     */
+    function loadCssFile($path) {
+        echo '<link rel="stylesheet" href="' . $this->getUrl($path) . '">';
+    }
+
+    /**
+     * Loads JS variables.
+     *
+     * @param array $vars
+     *   An array of JS variables to set up.
+     */
+    function initJsVars($vars) {
+       echo '<script>var exportLargeProjects = ' . json_encode($vars) . ';</script>';
+    }
+
+    /**
+     * Calls a JS function implemented in the module global object.
+     *
+     * @param string $function
+     *   The callback function.
+     * @param array $params
+     *   Array containing callback parameters.
+     */
+    function callJsCallback($function, $params = array()) {
+        $input = empty($params) ? '' : '\'' . implode('\', \'', $params) . '\'';
+        echo '<script>if (typeof exportLargeProjects.' . $function . ' !== \'undefined\') exportLargeProjects.' . $function . '(' . $input . ');</script>';
+    }
+
+    /**
+     * Builds up Export Large Projects button.
+     */
+    protected function buildExportButton($project_id) {
+        $url = $this->getUrl('plugins/export.php');
+        foreach (array('fields_per_batch', 'max_execution_time_per_batch') as $setting) {
+            $url .= '&' . $setting . '=' . $this->getProjectSetting($setting);
+        }
+
+        $contents = RCView::img(array('src' => APP_PATH_IMAGES . 'go-down.png')) . ' ' . RCView::span(array(), 'Export Large Projects');
+        $contents = RCView::span(array('class' => 'ui-button-text'), $contents);
+        $contents = RCView::button(array(
+            'id' => 'export-large-projects-btn',
+            'class' => 'jqbuttonmed ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only',
+            'type' => 'button',
+            'role' => 'button',
+        ), $contents);
+
+        $this->initJsVars(array(
+            'buttonHtml' => $contents,
+            'url' => $url,
+        ));
+
+        $this->loadCssFile('css/export_project_button.css');
+        $this->loadJsFile('js/export_project_button.js');
+    }
 }
