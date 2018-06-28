@@ -1,0 +1,59 @@
+#elpErrorMsg {
+    display: none;
+}
+
+.chklisthdr {
+    color: #800000;
+    margin: 10px 0;
+}
+
+
+#progress-bar {
+    width: 90%;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.progress-filling {
+    width: 0;
+    background-color: #cce5ff;
+}
+
+.progress-percent {
+    width: 35px;
+    position: absolute;
+    top: 0;
+    right: -40px;
+}
+
+.progress-info {
+    margin-bottom: 10px;
+}
+
+#elp-download {
+    margin-top: 40px;
+    display: none;
+}
+
+#elp-download button {
+    color: #800000;
+    width: 200px;
+}
+
+.download-btn-image {
+    float: left;
+    padding-top: 2px;
+}
+
+.download-btn-label {
+    padding-top: 8px;
+}
+
+.download-info {
+    margin: 10px 0;
+}
+
+#elp-error {
+    display: none;
+}
