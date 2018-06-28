@@ -1,7 +1,7 @@
 {
     "name": "Export large projects",
     "namespace": "ExportLargeProjects\\ExternalModule",
-    "description": "This module enables REDCap to export large projects without getting a timeout. This module is developed to bring Stanford University's Large Project Export plugin to REDCap's external modules. See the <b><a href='https://github.com/ctsit/export_large_projects' target='_blank'>documentation</a></b> at <a href='https://github.com/ctsit/export_large_projects' target='_blank'>https://github.com/ctsitexport_large_projects</a>",
+    "description": "This module enables REDCap to export large projects without getting a timeout. This module is developed to bring Stanford University's Large Project Export plugin to REDCap's external modules. See the <b><a href='https://github.com/ctsit/export_large_projects' target='_blank'>documentation</a></b> at <a href='https://github.com/ctsit/export_large_projects' target='_blank'>https://github.com/ctsit/export_large_projects</a>",
     "permissions": [
         "hook_every_page_top"
     ],
