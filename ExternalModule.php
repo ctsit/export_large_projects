@@ -44,7 +44,7 @@ class ExternalModule extends AbstractExternalModule {
             return;
         }
 
-        $rights = REDCap::getUserRights(USERID);
+        $rights = \REDCap::getUserRights(USERID);
         if (!empty($rights[USERID]['data_export_tool'])) {
             return;
         }
