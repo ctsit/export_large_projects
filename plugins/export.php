@@ -51,7 +51,7 @@ $start_time = microtime(true);
 $items_processed = 0;
 
 // Placing hidden error container.
-displayMsg(RCView::span(array()), 'elpErrorMsg', 'center', 'red', 'exclamation.png', null, false);
+displayMsg(RCView::span(array(),''), 'elpErrorMsg', 'center', 'red', 'exclamation.png', null, false);
 
 include_once 'progress_bar.php';
 include_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php';
